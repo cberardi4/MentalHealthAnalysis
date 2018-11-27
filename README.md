@@ -1,5 +1,3 @@
-# MentalHealthAnalysis
-
 # Mental Health in the Tech Workplace
 
 Dataset: ​https://www.kaggle.com/osmi/mental-health-in-tech-survey
