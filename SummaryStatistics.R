@@ -50,31 +50,68 @@ MHDF$remote_work <- ifelse(MHDF$remote_work == "No", 0, 1)
 cor(MHDF[sapply(MHDF, function(x) !is.factor(x))])
 summary(MHDF)
 
-# plots
-library(ggplot2)
-ggplot(MHDF, aes(x=seek_help)) + geom_bar() + labs(title="Frequency")  # Y axis derived from counts of X item
+# Correlation
+cor(MHDF$seek_help, MHDF$wellness_program)
 
-counts<- table(MHDF$seek_help, MHDF$wellness_program)
-barplot(counts, main="Do employee's seek mental health help based on their wellness program?",
-        xlab="Wellness program", col=c("black","orange","red"), ylab="Seek Help",
-        legend=c("Seeking help","Not seeking help","Don't know"),
-        names.arg=c("Yes", "No", "Don't Know"))
+# Matrix of 2 variables
+counts1<- table(MHDF$seek_help, MHDF$wellness_program)
+counts1
+barplot(counts1, main="Do employees seek mental health help based on their wellness program?",
+    	xlab="Wellness program", col=c("red","yellow","blue"), ylab="Seek Help",
+    	legend("topright", legend=c("Seeking help","Not seeking help","Don't know")),
+    	names.arg=c("Yes", "No", "Don't Know"))
 
-counts2<- table(MHDF$seek_help, MHDF$benefits)
-barplot(counts2, main="Do employer's provide mental health benefits or resources to seek help?",
-        xlab="Benefits", col=c("black","orange","red"), ylab="Helpful Resources",
-        legend=c("Yes","No","Don't know"),
-        names.arg=c("Yes", "No", "Don't know"))
+# Correlation
+cor(MHDF$family_history, MHDF$treatment)
 
-counts3 <- table(MHDF$family_history, MHDF$treatment, dnn = c("Family History", "Treatment"))
-barplot(counts3, main="Mental Health Issues Based on Family History",
-        xlab="Treatment", col=c("darkblue","red"),
+# Matrix of 2 variables
+counts2 <- table(MHDF$family_history, MHDF$treatment, dnn = c("Family History", "Treatment"))
+counts2
+barplot(counts2, main="Mental Health Issues Based on Family History",
+        xlab="Treatment", col=c("red","yellow"),
         legend = c("Family History", "No Family History"),
-        names.arg = c("Not Saught Help", "Saught Help"))
+        names.arg = c("Not Sought Help", "Sought Help"))
 
-counts4<- table(MHDF$mental_vs_physical, MHDF$anonymity)
+# Correlation
+cor(MHDF$care_options,MHDF$benefits)
+counts3<- table(MHDF$care_options, MHDF$benefit)
+counts3
+barplot(counts3, main="Are employees who have mental health benefits aware of them?",
+    	ylab="Care options", col=c("red","yellow","blue"), xlab="Benefits",
+    	legend=c("Yes","No","Don't know"),
+    	names.arg=c("Yes","No","Not sure"))
+
+# Correlation
+cor(MHDF$seek_help,MHDF$benefits)
+
+# Matrix of 2 variables
+counts4<- table(MHDF$seek_help, MHDF$benefits)
 counts4
-barplot(counts4, main="Do employer's take mental health as seriously as physical and are they anonymous?",
-        xlab="Mental Health Importance", col=c("black","orange","red"), ylab="Anonymity",
+barplot(counts4, main="Do employers provide mental health benefits or resources to seek help?",
+        xlab="Benefits", col=c("red","yellow","blue"), ylab="Helpful Resources",
         legend=c("Yes","No","Don't know"),
         names.arg=c("Yes", "No", "Don't know"))
+
+# Correlation
+cor(MHDF$mental_vs_physical, MHDF$anonymity)
+
+# Matrix of 2 variables
+counts5<- table(MHDF$mental_vs_physical, MHDF$anonymity)
+counts5
+barplot(counts5, main="Do employers take mental health as seriously as physical and are they anonymous?",
+        xlab="Mental Health Importance", col=c("red","yellow","blue"), ylab="Anonymity",
+        legend=c("Yes","No","Don't know"),
+        names.arg=c("Yes", "No", "Don't know"))
+# Correlation
+cor(MHDF$mental_vs_physical, MHDF$leave)
+
+# Matrix of 2 variables
+counts6 <- table(MHDF$mental_vs_physical, MHDF$leave)
+counts6
+barplot(counts6, main = "Mental Health Leave Based on Companies' Mental Health Attitudes", 
+        ylab = "Employers Take Mental Health As Seriously As Physical Health",
+        xlab = "How Easy to Take Mental Health Leave",
+        names.arg = c("Very Easy", "Somewhat Easy", "Very Difficult", "Somewhat Difficult", "Don't Know"),
+        legend = c("Yes", "No", "Don't Know"),
+        col=c("red","yellow", "blue"),
+        beside = TRUE)
