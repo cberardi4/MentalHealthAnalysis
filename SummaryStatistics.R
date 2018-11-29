@@ -1,3 +1,5 @@
+set.seed(1861)
+
 MHDF <- read.csv("survey.csv")
 
 MHDF$Gender <- ifelse(MHDF$Gender == "F", 0, 1)
@@ -26,9 +28,9 @@ MHDF$seek_help <-ifelse(MHDF$seek_help == "Yes", 1,
 MHDF$anonymity <-ifelse(MHDF$anonymity == "Yes", 1, 
                         ifelse(MHDF$anonymity == "No", 2,3))
 MHDF$leave <- ifelse(MHDF$leave == "Very easy", 1,
-              ifelse(MHDF$leave == "Somewhat easy", 2,
-              ifelse(MHDF$leave == "Very difficult",3,
-              ifelse(MHDF$leave == "Somewhat difficult",4,5))))
+                     ifelse(MHDF$leave == "Somewhat easy", 2,
+                            ifelse(MHDF$leave == "Very difficult",3,
+                                   ifelse(MHDF$leave == "Somewhat difficult",4,5))))
 
 MHDF$Country <- ifelse(MHDF$Country == "United States", 1, 
                        ifelse(MHDF$Country == "United Kingdom", 2, 3))
@@ -57,9 +59,9 @@ cor(MHDF$seek_help, MHDF$wellness_program)
 counts1<- table(MHDF$seek_help, MHDF$wellness_program)
 counts1
 barplot(counts1, main="Do employees seek mental health help based on their wellness program?",
-    	xlab="Wellness program", col=c("red","yellow","blue"), ylab="Seek Help",
-    	legend("topright", legend=c("Seeking help","Not seeking help","Don't know")),
-    	names.arg=c("Yes", "No", "Don't Know"))
+        xlab="Wellness program", col=c("red","yellow","blue"), ylab="Seek Help",
+        legend("topright", legend=c("Seeking help","Not seeking help","Don't know")),
+        names.arg=c("Yes", "No", "Don't Know"))
 
 # Correlation
 cor(MHDF$family_history, MHDF$treatment)
@@ -77,9 +79,9 @@ cor(MHDF$care_options,MHDF$benefits)
 counts3<- table(MHDF$care_options, MHDF$benefit)
 counts3
 barplot(counts3, main="Are employees who have mental health benefits aware of them?",
-    	ylab="Care options", col=c("red","yellow","blue"), xlab="Benefits",
-    	legend=c("Yes","No","Don't know"),
-    	names.arg=c("Yes","No","Not sure"))
+        ylab="Care options", col=c("red","yellow","blue"), xlab="Benefits",
+        legend=c("Yes","No","Don't know"),
+        names.arg=c("Yes","No","Not sure"))
 
 # Correlation
 cor(MHDF$seek_help,MHDF$benefits)
@@ -115,3 +117,104 @@ barplot(counts6, main = "Mental Health Leave Based on Companies' Mental Health A
         legend = c("Yes", "No", "Don't Know"),
         col=c("red","yellow", "blue"),
         beside = TRUE)
+
+trainSize <- 0.75
+trainInd <- sample(1:nrow(MHDF), size = floor(nrow(MHDF) * trainSize))
+MHDFTrain <- MHDF[trainInd, ]
+MHDFTest <- MHDF[-trainInd, ]
+
+
+library(ISLR)
+
+# linear model
+treatLM <- lm(treatment ~., data = MHDF)
+
+predsTrain <- predict(treatLM, newdata = MHDFTrain)
+predsTest <- predict(treatLM, newdata = MHDFTest)
+plot(treatLM)
+
+MSE <- function(ytrue, ypreds){
+  return(mean((ytrue - ypreds)^2))}
+MSEtrain <- MSE(MHDFTrain$treatment, predsTrain)
+# 0.1857
+MSEtest <- MSE(MHDFTest$treatment, predsTest)
+# 0.2091
+
+# tree
+library(rpart)
+treeFit <- rpart(treatment ~., data = MHDFTrain)
+summary(treeFit)
+plot(treeFit); text(treeFit,pretty=0)
+
+predsTrainTree <- predict(treeFit, newdata = MHDFTrain)
+predsTestTree <- predict(treeFit, newdata = MHDFTest)
+
+MSEtrainTree <- MSE(MHDFTrain$treatment, predsTrainTree)
+# 0.1184
+MSEtestTree <- MSE(MHDFTest$treatment, predsTestTree)
+# 0.1421
+
+# random forest
+library(randomForest)
+
+rf.health = randomForest(treatment~.,data=MHDF,subset=trainInd,mtry=3,ntree=500)
+rf.health
+
+predsTrainRF <- predict(rf.health, newdata = MHDFTrain)
+predsTestRF <- predict(rf.health, newdata = MHDFTest)
+MSEtrainRF <- MSE(MHDFTrain$treatment, predsTrainRF)
+# 0.0450
+MSEtestRF <- MSE(MHDFTest$treatment, predsTestRF)
+# 0.1506
+
+
+#linear model
+obsLM <- lm(obs_consequence ~., data = MHDF)
+
+#Decision tree
+
+#2d. Plot the fitted tree using the plot() function. Use text() to add text to the object.
+install.packages("rpart")
+library("rpart")
+obstree<-rpart(obs_consequence~., data=MHDFTrain)
+par(mar=c(0,0,0,0))
+plot(obstree); text(obstree,pretty=0,use.n=TRUE)
+
+#2f. Use the predict function to get predicted values for data in the training and validation set. Calculate MSE for both sets.
+predtrain<-predict(obstree,MHDFTrain)
+predval<-predict(obstree,MHDFTest)
+
+MSE(predtrain, MHDFTrain$obs_consequence)
+.099
+MSE(predval, MHDFTest$obs_consequence)
+.12
+
+
+#2g. Estimate a random forest model using the randomForest function in the package of the same name.Use mtry = 3 as a parameter.
+install.packages("randomForest")
+library("randomForest")
+fit=randomForest(obs_consequence~., data=MHDFTrain,mtry=3)
+
+predtrain1<-predict(fit,MHDFTrain)
+predval2<-predict(fit,MHDFTest)
+
+MSE(predtrain1, MHDFTrain$obs_consequence)
+
+MSE(predval2, MHDFTest$obs_consequence)
+
+# Regularization
+install.packages("useful")
+library(useful)
+library(glmnet)
+install.packages("glmnet")
+
+formula <- as.formula(treatment~.)
+
+Xvars <- build.x(formula = formula, data = MHDFTrain, contrasts = TRUE)
+Yvar <- build.y(formula = formula, data = MHDFTrain)
+
+# cv.glmnet() 
+LassoFit <- cv.glmnet(x = Xvars, y = Yvar, 
+                      alpha = 1)
+LassoFit
+coef(LassoFit, s = "lambda.min")
