@@ -3,30 +3,30 @@ set.seed(1861)
 MHDF <- read.csv("survey.csv")
 
 MHDF$Gender <- ifelse(MHDF$Gender == "F", 0, 1)
-MHDF$mental_health_consequence <- ifelse(MHDF$mental_health_consequence == "Yes", 1, 
-                                         ifelse(MHDF$mental_health_consequence == "No", 2, 3))
-MHDF$phys_health_consequence <- ifelse(MHDF$phys_health_consequence == "Yes", 1, 
-                                       ifelse(MHDF$phys_health_consequence == "No", 2, 3))
-MHDF$coworkers <- ifelse(MHDF$coworkers == "Yes", 1, ifelse(MHDF$coworkers == "No", 2, 3))
-MHDF$supervisor <- ifelse(MHDF$supervisor == "Yes", 1, ifelse(MHDF$supervisor == "No", 2, 3))
-MHDF$mental_health_interview <- ifelse(MHDF$mental_health_interview == "Yes", 1,
-                                       ifelse(MHDF$mental_health_interview == "No", 2, 3))
-MHDF$phys_health_interview <- ifelse(MHDF$phys_health_interview == "Yes", 1, 
-                                     ifelse(MHDF$phys_health_interview == "No", 2, 3))
-MHDF$mental_vs_physical <- ifelse(MHDF$mental_vs_physical == "Yes", 1, 
-                                  ifelse(MHDF$mental_vs_physical == "No", 2, 3))
+MHDF$mental_health_consequence <- ifelse(MHDF$mental_health_consequence == "Yes", 2, 
+                                         ifelse(MHDF$mental_health_consequence == "No", 0, 1))
+MHDF$phys_health_consequence <- ifelse(MHDF$phys_health_consequence == "Yes", 2, 
+                                       ifelse(MHDF$phys_health_consequence == "No", 0, 1))
+MHDF$coworkers <- ifelse(MHDF$coworkers == "Yes", 2, ifelse(MHDF$coworkers == "No", 0, 2))
+MHDF$supervisor <- ifelse(MHDF$supervisor == "Yes", 2, ifelse(MHDF$supervisor == "No", 0, 1))
+MHDF$mental_health_interview <- ifelse(MHDF$mental_health_interview == "Yes", 2,
+                                       ifelse(MHDF$mental_health_interview == "No", 0, 1))
+MHDF$phys_health_interview <- ifelse(MHDF$phys_health_interview == "Yes", 2, 
+                                     ifelse(MHDF$phys_health_interview == "No", 0, 2))
+MHDF$mental_vs_physical <- ifelse(MHDF$mental_vs_physical == "Yes", 2, 
+                                  ifelse(MHDF$mental_vs_physical == "No", 0, 1))
 MHDF$obs_consequence <- ifelse(MHDF$obs_consequence == "No", 0, 1)
 MHDF$tech_company <-ifelse(MHDF$tech_company == "Yes", 1, 0)
-MHDF$benefits <-ifelse(MHDF$benefits == "Yes", 1, 
-                       ifelse(MHDF$benefits == "No", 2,3))
-MHDF$care_options <-ifelse(MHDF$care_options == "Yes", 1, 
-                           ifelse(MHDF$care_options == "No", 2,3))
-MHDF$wellness_program <-ifelse(MHDF$wellness_program == "Yes", 1, 
-                               ifelse(MHDF$wellness_program == "No", 2,3))
-MHDF$seek_help <-ifelse(MHDF$seek_help == "Yes", 1, 
-                        ifelse(MHDF$seek_help == "No", 2,3))
-MHDF$anonymity <-ifelse(MHDF$anonymity == "Yes", 1, 
-                        ifelse(MHDF$anonymity == "No", 2,3))
+MHDF$benefits <-ifelse(MHDF$benefits == "Yes", 2, 
+                       ifelse(MHDF$benefits == "No", 0,1))
+MHDF$care_options <-ifelse(MHDF$care_options == "Yes", 2, 
+                           ifelse(MHDF$care_options == "No", 0,1))
+MHDF$wellness_program <-ifelse(MHDF$wellness_program == "Yes", 2, 
+                               ifelse(MHDF$wellness_program == "No", 0,1))
+MHDF$seek_help <-ifelse(MHDF$seek_help == "Yes", 2, 
+                        ifelse(MHDF$seek_help == "No", 0,1))
+MHDF$anonymity <-ifelse(MHDF$anonymity == "Yes", 2, 
+                        ifelse(MHDF$anonymity == "No", 0,1))
 MHDF$leave <- ifelse(MHDF$leave == "Very easy", 1,
                      ifelse(MHDF$leave == "Somewhat easy", 2,
                             ifelse(MHDF$leave == "Very difficult",3,
@@ -37,10 +37,10 @@ MHDF$Country <- ifelse(MHDF$Country == "United States", 1,
 MHDF$self_employed <- ifelse(MHDF$self_employed == "No", 1, 0)
 MHDF$family_history <- ifelse(MHDF$family_history == "No", 1, 0)
 MHDF$treatment <- ifelse(MHDF$treatment == "No", 1, 0)
-MHDF$work_interfere <- ifelse(is.na(MHDF$work_interfere), 5, 
-                              ifelse(MHDF$work_interfere == "Often", 2, 
-                                     ifelse(MHDF$work_interfere == "Rarely", 3, 
-                                            ifelse(MHDF$work_interfere == "Sometimes", 4, 1))))
+MHDF$work_interfere <- ifelse(is.na(MHDF$work_interfere), 1, 
+                              ifelse(MHDF$work_interfere == "Often", 4, 
+                                     ifelse(MHDF$work_interfere == "Rarely", 2, 
+                                            ifelse(MHDF$work_interfere == "Sometimes", 3, 1))))
 MHDF$no_employees <- ifelse(MHDF$no_employees == "1-5", 1, 
                             ifelse(MHDF$no_employees == "6-25", 2, 
                                    ifelse(MHDF$no_employees == "26-100", 3, 
@@ -148,6 +148,7 @@ plot(treeFit); text(treeFit,pretty=0)
 
 predsTrainTree <- predict(treeFit, newdata = MHDFTrain)
 predsTestTree <- predict(treeFit, newdata = MHDFTest)
+predsTestTree
 
 MSEtrainTree <- MSE(MHDFTrain$treatment, predsTrainTree)
 # 0.1184
@@ -158,7 +159,7 @@ MSEtestTree <- MSE(MHDFTest$treatment, predsTestTree)
 library(randomForest)
 
 rf.health = randomForest(treatment~.,data=MHDF,subset=trainInd,mtry=3,ntree=500)
-rf.health
+summary(rf.health)
 
 predsTrainRF <- predict(rf.health, newdata = MHDFTrain)
 predsTestRF <- predict(rf.health, newdata = MHDFTest)
@@ -185,14 +186,13 @@ predtrain<-predict(obstree,MHDFTrain)
 predval<-predict(obstree,MHDFTest)
 
 MSE(predtrain, MHDFTrain$obs_consequence)
-.099
+
 MSE(predval, MHDFTest$obs_consequence)
-.12
+
 
 
 #2g. Estimate a random forest model using the randomForest function in the package of the same name.Use mtry = 3 as a parameter.
-install.packages("randomForest")
-library("randomForest")
+
 fit=randomForest(obs_consequence~., data=MHDFTrain,mtry=3)
 
 predtrain1<-predict(fit,MHDFTrain)
@@ -218,3 +218,5 @@ LassoFit <- cv.glmnet(x = Xvars, y = Yvar,
                       alpha = 1)
 LassoFit
 coef(LassoFit, s = "lambda.min")
+plot(LassoFit)
+
