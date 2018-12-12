@@ -1,5 +1,3 @@
-# final project 
-# Jennifer Prosinski
 
 setwd("/Users/jennprosinski/Downloads/")
 MHDF <- read.csv("survey.csv")
