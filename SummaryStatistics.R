@@ -1,7 +1,8 @@
-
+# read in dataset
 setwd("/Users/jennprosinski/Downloads/")
 MHDF <- read.csv("survey.csv")
 
+# set factors to binary values or levels
 MHDF$Gender <- ifelse(MHDF$Gender == "F", 0, 1)
 MHDF$mental_health_consequence <- ifelse(MHDF$mental_health_consequence == "Yes", 2, 
                                          ifelse(MHDF$mental_health_consequence == "No", 0, 1))
@@ -41,17 +42,26 @@ MHDF$work_interfere <- ifelse(is.na(MHDF$work_interfere), 0,
 levels(MHDF$no_employees)
 MHDF$remote_work <- ifelse(MHDF$remote_work == "No", 0, 1)
 
+# --------------------------
+# EXPLORATORY DATA ANALYSIS
+# --------------------------
+
+# find correlated values in dataaset
 cor(MHDF[sapply(MHDF, function(x) !is.factor(x))])
 summary(MHDF)
 
-# plots
-library(ggplot2)
+# -------
+# PLOTS
+# -------                
+library(ggplot2)   
 ggplot(MHDF, aes(x=seek_help)) + geom_bar() + labs(title="Frequency")  # Y axis derived from counts of X item
 
+# barplot: wellness_program
 counts<- table(MHDF$wellness_program)
 barplot(counts, main="Do Companies Have Mental Wellness Programs?",
         xlab=("Wellness program"), names.arg = c("Yes", "No", "Don't Know"), col="blue")
 
+# barplot: mental_vs_physical vs. anonymity
 counts4<- table(MHDF$mental_vs_physical, MHDF$anonymity)
 counts4
 barplot(counts4, main="Do employer's Take Mental Health as Seriously as Physical and Are They Anonymous?",
@@ -61,65 +71,103 @@ barplot(counts4, main="Do employer's Take Mental Health as Seriously as Physical
 
 library(ISLR)
 
-# linear model
+# -------
+# MODELS
+# -------
+
+# -------------
+# Linear Models
+# -------------
+                
+# linear model: treatment
 treatLM <- lm(treatment ~., data = MHDF)
 summary(treatLM)
 
+# linear model: seek_help
+# model from presentation
 helpLM <- lm(seek_help ~., data = MHDF)
 summary(helpLM)
 
+# linear model: benefits
 familyLM <- lm(benefits ~., data = MHDF)
 summary(familyLM)
+  
+# linear model: work_interfere
+lm <- lm(MHDF$work_interfere~., data = MHDF)
+summary(lm)
 
+# create training and test data from MHDF dataset
 trainsize <- 0.75
 trainInd <- sample(1:nrow(MHDF), size = floor(nrow(MHDF) * trainsize))
 trainDF <- MHDF[trainInd, ]
 testDF <- MHDF[-trainInd, ]
+
+# predictions based on treatLM model
 treatLM$coefficients
 predsTrain <- predict(treatLM, newdata = trainDF)
 predsTest <- predict(treatLM, newdata = testDF)
 plot(treatLM)
 
+# calculates the MSE
 MSE <- function(ytrue, ypreds){
   return(mean((ytrue - ypreds)^2))}
-MSEtrain <- MSE(trainDF$treatment, predsTrain)
-# 0.1857
-MSEtest <- MSE(testDF$treatment, predsTest)
-# 0.2091
 
-# tree
+# MSE Values for model
+# MSE: training data
+MSEtrain <- MSE(trainDF$treatment, predsTrain)
+
+# MSE: testing data
+MSEtest <- MSE(testDF$treatment, predsTest)
+              
+# ------------
+# TREE MODELS
+# ------------
+
+# tree model: seek_helo
 library(rpart)
 treeFit <- rpart(seek_help ~., data = trainDF)
 summary(treeFit)
 plot(treeFit); text(treeFit,pretty=0)
 
+# predictions based on training and testing data
+
+# training data
 predsTrainTree <- predict(treeFit, newdata = trainDF)
+# testing data
 predsTestTree <- predict(treeFit, newdata = testDF)
 
+ # training data               
 MSEtrainTree <- MSE(trainDF$treatment, predsTrainTree)
-# 0.1184
+# testing data
 MSEtestTree <- MSE(testDF$treatment, predsTestTree)
-# 0.1421
 
+# --------------
+# LOGISTIC MODEL
+# --------------
 
-# logistic model
+# logistic model: work_interfere
 logitfit<- glm(MHDF$work_interfere~., data = MHDF)
 summary(logitfit)
 
-lm <- lm(MHDF$work_interfere~., data = MHDF)
-summary(lm)
+# ----------------------------
+# FORWARD STEPWISE REGRESSION               
+# ----------------------------
 
-
-#stepwise regression
+#stepwise regression: seek_help
+# using leaps library
 library(leaps)
 reg.forward <- regsubsets(seek_help~., data = MHDF, method = c("forward"))
 summary(reg.forward)
+# new model with variables selected in stepwise regression
 updated_model <- lm(seek_help ~ no_employees + benefits + care_options +wellness_program+
                       leave+mental_vs_physical, data = MHDF)
 summary(updated_model)
 
+# ---------------------
+# LASSO REGULARIZATION
+# ---------------------
 
-# lasso
+# using useful and glmnet libraries
 library(useful)
 library(glmnet)
 
@@ -127,7 +175,9 @@ formula <- as.formula(seek_help~.)
 
 Xvars <- build.x(formula = formula, data = trainDF, contrasts = TRUE)
 Yvar <- build.y(formula = formula, data = trainDF)
-# cv.glmnet() 
+
+# lasso: seek_help
+# based on 1se model
 LassoFit <- cv.glmnet(x = Xvars, y = Yvar, 
                       alpha = 1)
 LassoFit
