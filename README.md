@@ -22,4 +22,4 @@ having a mental health issue. We will create many different models. First, we wi
 Another model that we plan to create is one based on the work_interfere variable. This variable is another indicator that someone has mental health issues. From here, we will create a subset of just people who have said yes, and follow the same procedure of variable selection and finding correlations.
 We also created a tree model, based on seek_help, and performed forward stepwise regression. From there, we created a new model based on the most stastically significant variables. Lastly, we performed a logistic regression model on the work_interfere variable.
 
-A link to our presentation can be found [here](https://docs.google.com/presentation/d/1LNF5VVoURVZl1l0MdVPCfSmia5YOt_LKlIYFa40-4fA/edit?usp=sharing)
+A link to our presentation can be found [here](https://docs.google.com/presentation/d/1LNF5VVoURVZl1l0MdVPCfSmia5YOt_LKlIYFa40-4fA/edit?usp=sharing).
