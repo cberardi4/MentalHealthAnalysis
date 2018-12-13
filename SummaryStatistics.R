@@ -123,7 +123,7 @@ MSEtest <- MSE(testDF$treatment, predsTest)
 # TREE MODELS
 # ------------
 
-# tree model: seek_helo
+# tree model: seek_help
 library(rpart)
 treeFit <- rpart(seek_help ~., data = trainDF)
 summary(treeFit)
