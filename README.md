@@ -23,3 +23,6 @@ Another model that we plan to create is one based on the work_interfere variable
 We also created a tree model, based on seek_help, and performed forward stepwise regression. From there, we created a new model based on the most stastically significant variables. Lastly, we performed a logistic regression model on the work_interfere variable.
 
 A link to our presentation can be found [here](https://docs.google.com/presentation/d/1LNF5VVoURVZl1l0MdVPCfSmia5YOt_LKlIYFa40-4fA/edit?usp=sharing).
+
+
+https://tinyurl.com/githubGem1.
